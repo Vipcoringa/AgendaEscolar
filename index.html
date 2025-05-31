@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horários das Aulas - Agenor Medeiros</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+@keyframes highlight {
+0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+50% { box-shadow: 0 0 20px 10px rgba(59, 130, 246, 0.3); }
+100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+}
+body {
+font-family: 'Montserrat', sans-serif;
+background-color: #1A1B2E;
+color: #e0e0ff;
+}
+.time-cell {
+font-family: 'Space Mono', monospace;
+}
+.table-container::-webkit-scrollbar {
+height: 8px;
+}
+.table-container::-webkit-scrollbar-track {
+background: #212244;
+border-radius: 8px;
+}
+.table-container::-webkit-scrollbar-thumb {
+background: #3D4280;
+border-radius: 8px;
+}
+.table-container::-webkit-scrollbar-thumb:hover {
+background: #4A51A0;
+}
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(10px); }
+to { opacity: 1; transform: translateY(0); }
+}
+.fade-in {
+animation: fadeIn 0.6s ease-out forwards;
+}
+.cell-hover:hover {
+background-color: #2A2C5A;
+transform: scale(1.02);
+transition: all 0.2s ease;
+}
+.teacher-card {
+opacity: 0;
+transform: translateY(20px);
+transition: all 0.3s ease;
+}
+.teacher-card.show {
+opacity: 1;
+transform: translateY(0);
+}
+.glow-text {
+text-shadow: 0 0 10px rgba(66, 153, 225, 0.6);
+}
+.grid-pattern {
+background-image: radial-gradient(#3D4280 1px, transparent 1px);
+background-size: 20px 20px;
+}
+</style>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#3B82F6',secondary:'#2E3267'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+</head>
+<body class="min-h-screen grid-pattern">
+<nav class="fixed w-full top-0 bg-[#1A1B2E]/90 backdrop-blur-md z-50 border-b border-[#3D4280] shadow-lg">
+<div class="container mx-auto px-4 py-3 flex justify-between items-center">
+<div class="flex items-center">
+<h1 class="text-2xl md:text-3xl font-['Pacifico'] bg-gradient-to-r from-blue-400 to-blue-600 text-transparent bg-clip-text">Agenor Medeiros!</h1>
+</div>
+<div class="flex items-center gap-3">
+<span class="hidden md:inline-block text-sm font-medium bg-[#2E3267] px-3 py-1 rounded-full">
+<span id="current-time" class="text-blue-300"></span>
+</span>
+<span class="text-sm font-bold bg-blue-600 px-3 py-1 rounded-full">9º ANO B</span>
+</div>
+</div>
+</nav>
+<main class="container mx-auto px-4 pt-20 pb-10">
+<header class="mb-8 mt-4 fade-in" style="animation-delay: 0.1s;">
+<div class="flex items-center justify-center gap-3 mb-2">
+<div class="w-10 h-10 flex items-center justify-center bg-blue-600 rounded-full">
+<i class="ri-time-line ri-lg"></i>
+</div>
+<h2 class="text-2xl md:text-3xl font-bold text-center glow-text">HORÁRIOS DAS AULAS</h2>
+</div>
+<p class="text-center text-blue-300 text-sm">Atualizado em 31 de Maio de 2025</p>
+</header>
+<div class="table-container overflow-x-auto mb-10 fade-in rounded-lg border border-[#3D4280]" style="animation-delay: 0.2s;">
+<table class="w-full border-collapse">
+<thead>
+<tr class="bg-[#212244]">
+<th class="p-3 text-left text-sm font-semibold border-b border-[#3D4280]">Horário</th>
+<th class="p-3 text-center text-sm font-semibold border-b border-[#3D4280]">Segunda</th>
+<th class="p-3 text-center text-sm font-semibold border-b border-[#3D4280]">Terça</th>
+<th class="p-3 text-center text-sm font-semibold border-b border-[#3D4280]">Quarta</th>
+<th class="p-3 text-center text-sm font-semibold border-b border-[#3D4280]">Quinta</th>
+<th class="p-3 text-center text-sm font-semibold border-b border-[#3D4280]">Sexta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="p-3 text-sm font-medium text-blue-300 time-cell border-b border-[#3D4280] bg-[#212244]">07:30 - 08:20</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="CLUBE" data-room="--">CLUBE</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="ED. FÍSICA" data-room="8">ED. FÍSICA - 8</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="INGLÊS" data-room="2">INGLÊS - 2</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="MATEMÁTICA" data-room="2">MATEMÁTICA - 2</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="CIÊNCIAS" data-room="7">CIÊNCIAS - 7</td>
+</tr>
+<tr>
+<td class="p-3 text-sm font-medium text-blue-300 time-cell border-b border-[#3D4280] bg-[#212244]">08:20 - 09:10</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="CLUBE" data-room="--">CLUBE</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="PROJETO VIDA" data-room="5">PROJETO VIDA - 5</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="GEOGRAFIA" data-room="8">GEOGRAFIA - 8</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="EMA" data-room="8">EMA - 8</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="EMA" data-room="8">EMA - 8</td>
+</tr>
+<tr class="bg-[#2A2C5A]">
+<td class="p-3 text-sm font-medium text-blue-300 time-cell border-b border-[#3D4280] bg-[#212244]">09:10 - 09:25</td>
+<td colspan="5" class="p-2 text-sm border-b border-[#3D4280] text-center font-medium">
+<div class="flex items-center justify-center gap-2">
+<i class="ri-cup-line ri-lg text-blue-300"></i>
+<span>INTERVALO</span>
+</div>
+</td>
+</tr>
+<tr>
+<td class="p-3 text-sm font-medium text-blue-300 time-cell border-b border-[#3D4280] bg-[#212244]">09:25 - 10:15</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="MATEMÁTICA" data-room="3">MATEMÁTICA - 3</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="REDAÇÃO" data-room="3">REDAÇÃO - 3</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="TUTORIA" data-room="--">TUTORIA</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="OE PORT" data-room="5">OE PORT - 5</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="MATEMÁTICA" data-room="3">MATEMÁTICA - 3</td>
+</tr>
+<tr>
+<td class="p-3 text-sm font-medium text-blue-300 time-cell border-b border-[#3D4280] bg-[#212244]">10:15 - 11:05</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="PORTUGUÊS" data-room="3">PORTUGUÊS - 3</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="GEOGRAFIA" data-room="8">GEOGRAFIA - 8</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="MATEMÁTICA" data-room="2">MATEMÁTICA - 2</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="CIÊNCIAS" data-room="7">CIÊNCIAS - 7</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="OE MAT" data-room="7">OE MAT. - 7</td>
+</tr>
+<tr>
+<td class="p-3 text-sm font-medium text-blue-300 time-cell border-b border-[#3D4280] bg-[#212244]">11:05 - 11:55</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="CIÊNCIAS" data-room="7">CIÊNCIAS - 7</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="PRAT. EXP" data-room="8">PRAT. EXP - 8</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="PORTUGUÊS" data-room="3">PORTUGUÊS - 3</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="HISTÓRIA" data-room="6">HISTÓRIA - 6</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="GEOGRAFIA" data-room="--">GEOGRAFIA</td>
+</tr>
+<tr class="bg-[#2A2C5A]">
+<td class="p-3 text-sm font-medium text-blue-300 time-cell border-b border-[#3D4280] bg-[#212244]">11:55 - 12:45</td>
+<td colspan="5" class="p-2 text-sm border-b border-[#3D4280] text-center font-medium">
+<div class="flex items-center justify-center gap-2">
+<i class="ri-restaurant-line ri-lg text-blue-300"></i>
+<span>ALMOÇO</span>
+</div>
+</td>
+</tr>
+<tr>
+<td class="p-3 text-sm font-medium text-blue-300 time-cell border-b border-[#3D4280] bg-[#212244]">12:45 - 13:35</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="TUTORIA MAT" data-room="8">TUTORIA MAT. - 8</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="TECNOLOGIA" data-room="8">TECNOLOGIA - 8</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="INGLÊS" data-room="9">INGLÊS - 9</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="TUTORIA" data-room="--">TUTORIA</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="--" data-room="--">--</td>
+</tr>
+<tr>
+<td class="p-3 text-sm font-medium text-blue-300 time-cell border-b border-[#3D4280] bg-[#212244]">13:35 - 14:25</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="OE MAT" data-room="1">OE MAT - 1</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="PORTUGUÊS" data-room="3">PORTUGUÊS - 3</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="TECNOLOGIA" data-room="8">TECNOLOGIA - 8</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="ARTES" data-room="8">ARTES - 8</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="HISTÓRIA" data-room="5">HISTÓRIA - 5</td>
+</tr>
+<tr class="bg-[#2A2C5A]">
+<td class="p-3 text-sm font-medium text-blue-300 time-cell border-b border-[#3D4280] bg-[#212244]">14:25 - 14:50</td>
+<td colspan="5" class="p-2 text-sm border-b border-[#3D4280] text-center font-medium">
+<div class="flex items-center justify-center gap-2">
+<i class="ri-cup-line ri-lg text-blue-300"></i>
+<span>INTERVALO</span>
+</div>
+</td>
+</tr>
+<tr>
+<td class="p-3 text-sm font-medium text-blue-300 time-cell border-b border-[#3D4280] bg-[#212244]">14:50 - 15:40</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="ED. FÍSICA" data-room="8">ED. FÍSICA - 8</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="ROBÓTICA" data-room="9">ROBÓTICA - 9</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="HISTÓRIA" data-room="9">HISTÓRIA - 9</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="REDAÇÃO" data-room="9">REDAÇÃO - 9</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="ELETIVA" data-room="--">ELETIVA</td>
+</tr>
+<tr>
+<td class="p-3 text-sm font-medium text-blue-300 time-cell border-b border-[#3D4280] bg-[#212244]">15:40 - 16:30</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="OE. PORT" data-room="4">OE. PORT - 4</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="ROBÓTICA" data-room="9">ROBÓTICA - 9</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="CIÊNCIAS" data-room="7">CIÊNCIAS - 7</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="PORTUGUÊS" data-room="3">PORTUGUÊS - 3</td>
+<td class="p-2 text-sm border-b border-[#3D4280] text-center cell-hover" data-subject="ELETIVA" data-room="--">ELETIVA</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="professors-section" class="mb-10 fade-in" style="animation-delay: 0.3s;">
+<div class="flex items-center justify-center gap-3 mb-6">
+<div class="w-10 h-10 flex items-center justify-center bg-blue-600 rounded-full">
+<i class="ri-user-line ri-lg"></i>
+</div>
+<h2 class="text-xl md:text-2xl font-bold text-center glow-text">LISTAGEM DE PROFESSORES</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<div class="bg-[#212244] p-4 rounded-lg border border-[#3D4280] shadow-md hover:shadow-blue-900/20 transition-all duration-300 cell-hover">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 flex items-center justify-center bg-blue-600/20 rounded-full">
+<i class="ri-user-3-line ri-lg text-blue-400"></i>
+</div>
+<div>
+<h3 class="font-semibold">FÁBIO</h3>
+<p class="text-sm text-blue-300">GEOGRAFIA</p>
+</div>
+</div>
+<div class="text-sm">
+<p class="flex items-center gap-2 mb-1">
+<i class="ri-phone-line text-blue-400"></i>
+<span>(55) 16 99271-6927</span>
+</p>
+<p class="flex items-center gap-2">
+<i class="ri-mail-line text-blue-400"></i>
+<span>—</span>
+</p>
+</div>
+</div>
+<div class="bg-[#212244] p-4 rounded-lg border border-[#3D4280] shadow-md hover:shadow-blue-900/20 transition-all duration-300 cell-hover">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 flex items-center justify-center bg-blue-600/20 rounded-full">
+<i class="ri-user-3-line ri-lg text-blue-400"></i>
+</div>
+<div>
+<h3 class="font-semibold">LUCAS</h3>
+<p class="text-sm text-blue-300">CIÊNCIAS</p>
+</div>
+</div>
+<div class="text-sm">
+<p class="flex items-center gap-2 mb-1">
+<i class="ri-phone-line text-blue-400"></i>
+<span>(55) 16 99378-1195</span>
+</p>
+<p class="flex items-center gap-2">
+<i class="ri-mail-line text-blue-400"></i>
+<span>—</span>
+</p>
+</div>
+</div>
+<div class="bg-[#212244] p-4 rounded-lg border border-[#3D4280] shadow-md hover:shadow-blue-900/20 transition-all duration-300 cell-hover">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 flex items-center justify-center bg-blue-600/20 rounded-full">
+<i class="ri-user-3-line ri-lg text-blue-400"></i>
+</div>
+<div>
+<h3 class="font-semibold">SAMUEL</h3>
+<p class="text-sm text-blue-300">PRAT. EXP</p>
+</div>
+</div>
+<div class="text-sm">
+<p class="flex items-center gap-2 mb-1">
+<i class="ri-phone-line text-blue-400"></i>
+<span>INDISPONÍVEL</span>
+</p>
+<p class="flex items-center gap-2">
+<i class="ri-mail-line text-blue-400"></i>
+<span>—</span>
+</p>
+</div>
+</div>
+<div class="bg-[#212244] p-4 rounded-lg border border-[#3D4280] shadow-md hover:shadow-blue-900/20 transition-all duration-300 cell-hover">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 flex items-center justify-center bg-blue-600/20 rounded-full">
+<i class="ri-user-3-line ri-lg text-blue-400"></i>
+</div>
+<div>
+<h3 class="font-semibold">CARLA</h3>
+<p class="text-sm text-blue-300">ARTES & EMA</p>
+</div>
+</div>
+<div class="text-sm">
+<p class="flex items-center gap-2 mb-1">
+<i class="ri-phone-line text-blue-400"></i>
+<span>(55) 16 99615-5561</span>
+</p>
+<p class="flex items-center gap-2">
+<i class="ri-mail-line text-blue-400"></i>
+<span>—</span>
+</p>
+</div>
+</div>
+<div class="bg-[#212244] p-4 rounded-lg border border-[#3D4280] shadow-md hover:shadow-blue-900/20 transition-all duration-300 cell-hover">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 flex items-center justify-center bg-blue-600/20 rounded-full">
+<i class="ri-user-3-line ri-lg text-blue-400"></i>
+</div>
+<div>
+<h3 class="font-semibold">CRIS MIRANDA</h3>
+<p class="text-sm text-blue-300">HISTÓRIA</p>
+</div>
+</div>
+<div class="text-sm">
+<p class="flex items-center gap-2 mb-1">
+<i class="ri-phone-line text-blue-400"></i>
+<span>(55) 16 99277-5298</span>
+</p>
+<p class="flex items-center gap-2">
+<i class="ri-mail-line text-blue-400"></i>
+<span>—</span>
+</p>
+</div>
+</div>
+<div class="bg-[#212244] p-4 rounded-lg border border-[#3D4280] shadow-md hover:shadow-blue-900/20 transition-all duration-300 cell-hover">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 flex items-center justify-center bg-blue-600/20 rounded-full">
+<i class="ri-user-3-line ri-lg text-blue-400"></i>
+</div>
+<div>
+<h3 class="font-semibold">VANESSA</h3>
+<p class="text-sm text-blue-300">OE MAT & TEC</p>
+</div>
+</div>
+<div class="text-sm">
+<p class="flex items-center gap-2 mb-1">
+<i class="ri-phone-line text-blue-400"></i>
+<span>(55) 16 99702-2969</span>
+</p>
+<p class="flex items-center gap-2">
+<i class="ri-mail-line text-blue-400"></i>
+<span>—</span>
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="teacher-info" class="fixed bottom-20 left-0 right-0 mx-auto w-11/12 max-w-md bg-[#2E3267] p-4 rounded-lg shadow-xl border border-blue-500 teacher-card z-40 hidden">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 flex items-center justify-center bg-blue-600 rounded-full">
+<i class="ri-book-open-line ri-lg"></i>
+</div>
+<div>
+<h3 id="subject-title" class="font-bold text-lg">Matemática</h3>
+<p id="room-info" class="text-sm text-blue-300">Sala 3</p>
+</div>
+</div>
+<button id="close-info" class="text-blue-300 hover:text-white cursor-pointer !rounded-button">
+<i class="ri-close-line ri-lg"></i>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-3 text-sm">
+<div class="bg-[#212244] p-3 rounded-lg">
+<p class="text-blue-300 mb-1">Professor</p>
+<p id="teacher-name" class="font-medium">Raquel</p>
+</div>
+<div class="bg-[#212244] p-3 rounded-lg">
+<p class="text-blue-300 mb-1">Contato</p>
+<p id="teacher-contact" class="font-medium">INDISPONÍVEL</p>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-0 left-0 right-0 bg-[#1A1B2E]/90 backdrop-blur-md border-t border-[#3D4280] shadow-lg z-50">
+<div class="container mx-auto px-4">
+<div class="flex justify-around items-center py-3">
+<button class="flex flex-col items-center space-y-1 cursor-pointer !rounded-button">
+<div class="w-6 h-6 flex items-center justify-center text-blue-500">
+<i class="ri-time-line ri-lg"></i>
+</div>
+<span class="text-xs text-blue-300">Horários</span>
+</button>
+<button id="professors-btn" class="flex flex-col items-center space-y-1 cursor-pointer !rounded-button">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-user-line ri-lg"></i>
+</div>
+<span class="text-xs">Professores</span>
+</button>
+<button id="settings-btn" class="flex flex-col items-center space-y-1 cursor-pointer !rounded-button">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-magic-line ri-lg"></i>
+</div>
+<span class="text-xs">Efeitos</span>
+</button>
+</div>
+</div>
+</div>
+<div id="notifications-panel" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50">
+<div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-md bg-[#212244] rounded-lg shadow-xl border border-[#3D4280] p-5">
+<div class="flex justify-between items-center mb-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 flex items-center justify-center bg-blue-600 rounded-full">
+<i class="ri-notification-3-line ri-lg"></i>
+</div>
+<h3 class="text-xl font-bold">Avisos</h3>
+</div>
+<button id="close-notifications" class="text-blue-300 hover:text-white">
+<i class="ri-close-line ri-2x"></i>
+</button>
+</div>
+<div class="space-y-4 max-h-[60vh] overflow-y-auto">
+<div class="bg-[#2E3267] p-4 rounded-lg border border-[#3D4280]">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-semibold">Prova de Matemática</h4>
+<span class="text-xs text-blue-300">31/05/2025</span>
+</div>
+<p class="text-sm text-gray-300 mb-3">Avaliação sobre Geometria Analítica. Conteúdo: Distância entre pontos, ponto médio e área de triângulos.</p>
+<button class="text-xs bg-blue-600/20 text-blue-300 px-3 py-1 rounded-full hover:bg-blue-600/30 transition-colors !rounded-button">Marcar como lido</button>
+</div>
+<div class="bg-[#2E3267] p-4 rounded-lg border border-[#3D4280]">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-semibold">Reunião de Pais</h4>
+<span class="text-xs text-blue-300">05/06/2025</span>
+</div>
+<p class="text-sm text-gray-300 mb-3">Reunião para entrega de boletins e discussão sobre o desempenho dos alunos no primeiro trimestre.</p>
+<button class="text-xs bg-blue-600/20 text-blue-300 px-3 py-1 rounded-full hover:bg-blue-600/30 transition-colors !rounded-button">Marcar como lido</button>
+</div>
+<div class="bg-[#2E3267] p-4 rounded-lg border border-[#3D4280]">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-semibold">Feira de Ciências</h4>
+<span class="text-xs text-blue-300">15/06/2025</span>
+</div>
+<p class="text-sm text-gray-300 mb-3">Apresentação dos projetos desenvolvidos nas aulas de Ciências. Tema: Sustentabilidade e Meio Ambiente.</p>
+<button class="text-xs bg-blue-600/20 text-blue-300 px-3 py-1 rounded-full hover:bg-blue-600/30 transition-colors !rounded-button">Marcar como lido</button>
+</div>
+</div>
+</div>
+</div>
+<div id="settings-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50">
+<div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-md bg-[#212244] rounded-lg shadow-xl border border-[#3D4280] p-5">
+<div class="flex justify-between items-center mb-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 flex items-center justify-center bg-blue-600 rounded-full">
+<i class="ri-magic-line ri-lg"></i>
+</div>
+<h3 class="text-xl font-bold">Efeitos Visuais</h3>
+</div>
+<button id="close-settings" class="text-blue-300 hover:text-white">
+<i class="ri-close-line ri-2x"></i>
+</button>
+</div>
+<div class="space-y-6">
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<label class="flex items-center gap-2">
+<i class="ri-snowy-line text-blue-400"></i>
+<span>Efeito de Neve</span>
+</label>
+<label class="relative inline-flex items-center cursor-pointer">
+<input type="checkbox" id="snow-effect" class="sr-only peer">
+<div class="w-11 h-6 bg-[#3D4280] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+</label>
+</div>
+<div class="flex items-center justify-between">
+<label class="flex items-center gap-2">
+<i class="ri-bubble-chart-line text-blue-400"></i>
+<span>Bolhas Flutuantes</span>
+</label>
+<label class="relative inline-flex items-center cursor-pointer">
+<input type="checkbox" id="bubble-effect" class="sr-only peer">
+<div class="w-11 h-6 bg-[#3D4280] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+</label>
+</div>
+<div class="flex items-center justify-between">
+<label class="flex items-center gap-2">
+<i class="ri-sparkles-line text-blue-400"></i>
+<span>Brilhos ao Clicar</span>
+</label>
+<label class="relative inline-flex items-center cursor-pointer">
+<input type="checkbox" id="sparkle-effect" class="sr-only peer">
+<div class="w-11 h-6 bg-[#3D4280] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+</label>
+</div>
+</div>
+<div class="flex gap-3 mt-8">
+<button id="save-settings" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-medium transition-colors !rounded-button">
+Salvar Alterações
+</button>
+<button id="cancel-settings" class="flex-1 bg-[#3D4280] hover:bg-[#4A51A0] text-white py-2.5 rounded-lg font-medium transition-colors !rounded-button">
+Cancelar
+</button>
+</div>
+</div>
+</div>
+</div>
+<script id="time-display">
+document.addEventListener('DOMContentLoaded', function() {
+function updateTime() {
+const now = new Date();
+const hours = now.getHours().toString().padStart(2, '0');
+const minutes = now.getMinutes().toString().padStart(2, '0');
+document.getElementById('current-time').textContent = `${hours}:${minutes}`;
+}
+updateTime();
+setInterval(updateTime, 60000);
+});
+</script>
+<script id="cell-interaction">
+document.addEventListener('DOMContentLoaded', function() {
+const cells = document.querySelectorAll('.cell-hover');
+const teacherInfo = document.getElementById('teacher-info');
+const closeInfo = document.getElementById('close-info');
+const subjectTitle = document.getElementById('subject-title');
+const roomInfo = document.getElementById('room-info');
+const teacherName = document.getElementById('teacher-name');
+const teacherContact = document.getElementById('teacher-contact');
+// Mapeamento de disciplinas para professores
+const teacherMap = {
+'GEOGRAFIA': { name: 'Fábio', contact: '(55) 16 99271-6927' },
+'CIÊNCIAS': { name: 'Lucas', contact: '(55) 16 99378-1195' },
+'PRAT. EXP': { name: 'Samuel', contact: 'INDISPONÍVEL' },
+'ARTES': { name: 'Carla', contact: '(55) 16 99615-5561' },
+'EMA': { name: 'Carla', contact: '(55) 16 99615-5561' },
+'HISTÓRIA': { name: 'Cris Miranda', contact: '(55) 16 99277-5298' },
+'OE MAT': { name: 'Vanessa', contact: '(55) 16 99702-2969' },
+'TECNOLOGIA': { name: 'Vanessa', contact: '(55) 16 99702-2969' },
+'MATEMÁTICA': { name: 'Raquel', contact: 'INDISPONÍVEL' },
+'INGLÊS': { name: 'Janny', contact: 'INDISPONÍVEL' },
+'PORTUGUÊS': { name: 'Adriana', contact: 'INDISPONÍVEL' },
+'REDAÇÃO': { name: 'Adriana', contact: 'INDISPONÍVEL' },
+'OE PORT': { name: 'Adriana', contact: 'INDISPONÍVEL' },
+'ED. FÍSICA': { name: 'Ricardo', contact: 'INDISPONÍVEL' },
+'ROBÓTICA': { name: 'Marcos', contact: 'INDISPONÍVEL' },
+'PROJETO VIDA': { name: 'Coordenação', contact: 'INDISPONÍVEL' },
+'ELETIVA': { name: 'Vários', contact: 'INDISPONÍVEL' },
+'CLUBE': { name: 'Vários', contact: 'INDISPONÍVEL' },
+'TUTORIA': { name: 'Coordenação', contact: 'INDISPONÍVEL' },
+'TUTORIA MAT': { name: 'Raquel', contact: 'INDISPONÍVEL' }
+};
+cells.forEach(cell => {
+cell.addEventListener('click', function() {
+const subject = this.getAttribute('data-subject');
+const room = this.getAttribute('data-room');
+if (subject === '--') return;
+const teacher = teacherMap[subject] || { name: 'Não informado', contact: 'INDISPONÍVEL' };
+subjectTitle.textContent = subject;
+roomInfo.textContent = room !== '--' ? `Sala ${room}` : 'Sala não informada';
+teacherName.textContent = teacher.name;
+teacherContact.textContent = teacher.contact;
+teacherInfo.classList.remove('hidden');
+setTimeout(() => {
+teacherInfo.classList.add('show');
+}, 10);
+});
+});
+closeInfo.addEventListener('click', function() {
+teacherInfo.classList.remove('show');
+setTimeout(() => {
+teacherInfo.classList.add('hidden');
+}, 300);
+});
+});
+</script>
+<script id="scroll-animation">
+document.addEventListener('DOMContentLoaded', function() {
+const fadeElements = document.querySelectorAll('.fade-in');
+const professorsBtn = document.getElementById('professors-btn');
+const professorsSection = document.getElementById('professors-section');
+professorsBtn.addEventListener('click', function() {
+const allNavButtons = document.querySelectorAll('.bottom-0 button');
+allNavButtons.forEach(btn => {
+btn.querySelector('div').classList.remove('text-blue-500');
+btn.querySelector('span').classList.remove('text-blue-300');
+});
+this.querySelector('div').classList.add('text-blue-500');
+this.querySelector('span').classList.add('text-blue-300');
+professorsSection.scrollIntoView({ behavior: 'smooth' });
+setTimeout(() => {
+professorsSection.style.animation = 'highlight 1.5s ease-in-out';
+setTimeout(() => {
+professorsSection.style.animation = '';
+}, 1500);
+}, 500);
+});
+function checkScroll() {
+fadeElements.forEach(element => {
+const elementTop = element.getBoundingClientRect().top;
+const windowHeight = window.innerHeight;
+if (elementTop < windowHeight * 0.9) {
+element.style.opacity = '1';
+element.style.transform = 'translateY(0)';
+}
+});
+}
+// Inicializar
+checkScroll();
+// Adicionar evento de scroll
+window.addEventListener('scroll', checkScroll);
+});
+</script>
+<script id="notifications-handler">
+document.addEventListener('DOMContentLoaded', function() {
+const notificationsBtn = document.querySelector('.ri-notification-line').parentElement.parentElement;
+const notificationsPanel = document.getElementById('notifications-panel');
+const closeNotifications = document.getElementById('close-notifications');
+const readButtons = document.querySelectorAll('#notifications-panel button[class*="text-xs"]');
+notificationsBtn.addEventListener('click', function() {
+const allNavButtons = document.querySelectorAll('.bottom-0 button');
+allNavButtons.forEach(btn => {
+btn.querySelector('div').classList.remove('text-blue-500');
+btn.querySelector('span').classList.remove('text-blue-300');
+});
+this.querySelector('div').classList.add('text-blue-500');
+this.querySelector('span').classList.add('text-blue-300');
+notificationsPanel.classList.remove('hidden');
+});
+closeNotifications.addEventListener('click', function() {
+notificationsPanel.classList.add('hidden');
+});
+notificationsPanel.addEventListener('click', function(e) {
+if (e.target === notificationsPanel) {
+notificationsPanel.classList.add('hidden');
+}
+});
+readButtons.forEach(button => {
+button.addEventListener('click', function() {
+const notification = this.closest('div[class*="bg-[#2E3267]"]');
+notification.style.opacity = '0.6';
+this.textContent = 'Lido';
+this.disabled = true;
+this.style.cursor = 'default';
+});
+});
+});
+</script>
+<script id="settings-handler">
+document.addEventListener('DOMContentLoaded', function() {
+const settingsBtn = document.getElementById('settings-btn');
+const settingsModal = document.getElementById('settings-modal');
+const closeSettings = document.getElementById('close-settings');
+const saveSettings = document.getElementById('save-settings');
+const cancelSettings = document.getElementById('cancel-settings');
+let currentSettings = {
+snowEffect: false,
+bubbleEffect: false,
+sparkleEffect: false
+};
+function createSnowflake() {
+const snowflake = document.createElement('div');
+snowflake.className = 'snowflake';
+snowflake.style.cssText = `
+position: fixed;
+top: -10px;
+left: ${Math.random() * 100}vw;
+width: 4px;
+height: 4px;
+background: white;
+border-radius: 50%;
+pointer-events: none;
+animation: snowfall ${Math.random() * 3 + 2}s linear forwards;
+opacity: 0.7;
+`;
+document.body.appendChild(snowflake);
+snowflake.addEventListener('animationend', () => snowflake.remove());
+}
+function createBubble() {
+const bubble = document.createElement('div');
+bubble.className = 'bubble';
+bubble.style.cssText = `
+position: fixed;
+bottom: -20px;
+left: ${Math.random() * 100}vw;
+width: ${Math.random() * 20 + 10}px;
+height: ${Math.random() * 20 + 10}px;
+background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), rgba(59, 130, 246, 0.1));
+border-radius: 50%;
+pointer-events: none;
+animation: bubbleRise ${Math.random() * 4 + 3}s ease-in-out forwards;
+`;
+document.body.appendChild(bubble);
+bubble.addEventListener('animationend', () => bubble.remove());
+}
+function createSparkle(x, y) {
+const sparkle = document.createElement('div');
+sparkle.className = 'sparkle';
+sparkle.style.cssText = `
+position: fixed;
+left: ${x}px;
+top: ${y}px;
+width: 4px;
+height: 4px;
+background: #3B82F6;
+border-radius: 50%;
+pointer-events: none;
+animation: sparkle 0.8s ease-in-out forwards;
+`;
+document.body.appendChild(sparkle);
+sparkle.addEventListener('animationend', () => sparkle.remove());
+}
+const style = document.createElement('style');
+style.textContent = `
+@keyframes snowfall {
+0% { transform: translateY(0) rotate(0deg); }
+100% { transform: translateY(100vh) rotate(360deg); }
+}
+@keyframes bubbleRise {
+0% { transform: translateY(0) translateX(0); }
+50% { transform: translateY(-50vh) translateX(${Math.random() * 100 - 50}px); }
+100% { transform: translateY(-100vh) translateX(${Math.random() * 100 - 50}px); opacity: 0; }
+}
+@keyframes sparkle {
+0% { transform: scale(0); opacity: 1; }
+50% { transform: scale(1); opacity: 0.5; }
+100% { transform: scale(0); opacity: 0; }
+}
+`;
+document.head.appendChild(style);
+let snowInterval;
+let bubbleInterval;
+function toggleSnowEffect(enabled) {
+if (enabled) {
+snowInterval = setInterval(createSnowflake, 200);
+} else {
+clearInterval(snowInterval);
+document.querySelectorAll('.snowflake').forEach(el => el.remove());
+}
+}
+function toggleBubbleEffect(enabled) {
+if (enabled) {
+bubbleInterval = setInterval(createBubble, 300);
+} else {
+clearInterval(bubbleInterval);
+document.querySelectorAll('.bubble').forEach(el => el.remove());
+}
+}
+function toggleSparkleEffect(enabled) {
+if (enabled) {
+document.addEventListener('click', handleSparkleClick);
+} else {
+document.removeEventListener('click', handleSparkleClick);
+}
+}
+function handleSparkleClick(e) {
+for (let i = 0; i < 8; i++) {
+setTimeout(() => {
+createSparkle(e.clientX + (Math.random() * 40 - 20), e.clientY + (Math.random() * 40 - 20));
+}, i * 50);
+}
+}
+function loadSettings() {
+const savedSettings = localStorage.getItem('visualEffects');
+if (savedSettings) {
+currentSettings = JSON.parse(savedSettings);
+document.getElementById('snow-effect').checked = currentSettings.snowEffect;
+document.getElementById('bubble-effect').checked = currentSettings.bubbleEffect;
+document.getElementById('sparkle-effect').checked = currentSettings.sparkleEffect;
+toggleSnowEffect(currentSettings.snowEffect);
+toggleBubbleEffect(currentSettings.bubbleEffect);
+toggleSparkleEffect(currentSettings.sparkleEffect);
+}
+}
+function saveCurrentSettings() {
+currentSettings = {
+snowEffect: document.getElementById('snow-effect').checked,
+bubbleEffect: document.getElementById('bubble-effect').checked,
+sparkleEffect: document.getElementById('sparkle-effect').checked
+};
+localStorage.setItem('visualEffects', JSON.stringify(currentSettings));
+toggleSnowEffect(currentSettings.snowEffect);
+toggleBubbleEffect(currentSettings.bubbleEffect);
+toggleSparkleEffect(currentSettings.sparkleEffect);
+settingsModal.classList.add('hidden');
+const successToast = document.createElement('div');
+successToast.className = 'fixed bottom-20 left-1/2 -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center gap-2';
+successToast.innerHTML = `
+<i class="ri-check-line"></i>
+<span>Efeitos salvos com sucesso!</span>
+`;
+document.body.appendChild(successToast);
+setTimeout(() => {
+successToast.remove();
+}, 3000);
+}
+document.getElementById('snow-effect').addEventListener('change', function() {
+toggleSnowEffect(this.checked);
+});
+document.getElementById('bubble-effect').addEventListener('change', function() {
+toggleBubbleEffect(this.checked);
+});
+document.getElementById('sparkle-effect').addEventListener('change', function() {
+toggleSparkleEffect(this.checked);
+});
+settingsBtn.addEventListener('click', function() {
+loadSettings();
+settingsModal.classList.remove('hidden');
+});
+closeSettings.addEventListener('click', function() {
+settingsModal.classList.add('hidden');
+});
+saveSettings.addEventListener('click', saveCurrentSettings);
+cancelSettings.addEventListener('click', function() {
+settingsModal.classList.add('hidden');
+});
+settingsModal.addEventListener('click', function(e) {
+if (e.target === settingsModal) {
+settingsModal.classList.add('hidden');
+}
+});
+loadSettings();
+});
+</script>
+</body>
+</html>
